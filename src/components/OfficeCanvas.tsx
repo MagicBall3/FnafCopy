@@ -1,7 +1,14 @@
 import { useEffect, useRef } from 'react';
 import { FixedLoop } from '../game/fixedLoop';
 
-export function OfficeCanvas() {
+type OfficeCanvasProps = {
+  leftLight: boolean;
+  rightLight: boolean;
+  leftDoor: boolean;
+  rightDoor: boolean;
+};
+
+export function OfficeCanvas({ leftLight, rightLight, leftDoor, rightDoor }: OfficeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -22,10 +29,22 @@ export function OfficeCanvas() {
       glow.addColorStop(1, 'rgba(10, 14, 16, 0)');
       context.fillStyle = glow;
       context.fillRect(0, 0, width, height);
-      context.fillStyle = '#1a2121';
+      context.fillStyle = leftDoor ? '#111817' : '#1a2121';
       context.fillRect(width * 0.08, height * 0.12, width * 0.84, height * 0.58);
+      context.fillStyle = leftDoor ? '#56635c' : '#101615';
+      context.fillRect(width * 0.08, height * 0.2, width * 0.06, height * 0.42);
+      context.fillStyle = rightDoor ? '#56635c' : '#101615';
+      context.fillRect(width * 0.86, height * 0.2, width * 0.06, height * 0.42);
       context.fillStyle = '#0c1112';
       context.fillRect(width * 0.13, height * 0.18, width * 0.74, height * 0.45);
+      if (leftLight) {
+        context.fillStyle = `rgba(174, 208, 157, ${0.14 * flicker})`;
+        context.fillRect(width * 0.08, height * 0.2, width * 0.24, height * 0.42);
+      }
+      if (rightLight) {
+        context.fillStyle = `rgba(174, 208, 157, ${0.14 * flicker})`;
+        context.fillRect(width * 0.68, height * 0.2, width * 0.24, height * 0.42);
+      }
       context.strokeStyle = '#4a5550';
       context.lineWidth = 3;
       context.strokeRect(width * 0.13, height * 0.18, width * 0.74, height * 0.45);

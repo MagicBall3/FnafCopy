@@ -11,8 +11,22 @@ function requestMobileMode() {
 }
 
 export function GameApp() {
-  const { screen, selectedNight, setScreen, selectNight, startNight } = useGameStore();
+  const { screen, selectedNight, setScreen, selectNight, startNight, leftLight, rightLight, leftDoor, rightDoor, cameras, energy, isPaused, tick, toggleDevice, togglePause } = useGameStore();
   const [mobileHint, setMobileHint] = useState(false);
+
+  useEffect(() => {
+    if (screen !== 'office') return;
+    let previous = performance.now();
+    let frame = 0;
+    const update = (now: number) => {
+      const delta = Math.min((now - previous) / 1000, 0.1);
+      previous = now;
+      tick(delta);
+      frame = requestAnimationFrame(update);
+    };
+    frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
+  }, [screen, tick]);
 
   useEffect(() => {
     const isMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 700;
@@ -20,7 +34,18 @@ export function GameApp() {
   }, [screen]);
 
   if (screen === 'office') {
-    return <main className="game-shell"><OfficeCanvas /><div className="office-overlay"><span>СМЕНА {selectedNight} · 00:00</span><button className="pause-button" onClick={() => useGameStore.getState().togglePause()}>ПАУЗА</button></div><div className="touch-controls"><button>ЛЕВЫЙ СВЕТ</button><button>КАМЕРЫ</button><button>ПРАВЫЙ СВЕТ</button></div></main>;
+    const action = (device: Parameters<typeof toggleDevice>[0]) => () => toggleDevice(device);
+    return <main className="game-shell">
+      <OfficeCanvas leftLight={leftLight} rightLight={rightLight} leftDoor={leftDoor} rightDoor={rightDoor} />
+      <div className="office-overlay"><span>СМЕНА {selectedNight} · 00:00</span><span className={energy < 20 ? 'energy critical' : 'energy'}>ПИТАНИЕ {Math.ceil(energy)}%</span><button className="pause-button" onClick={togglePause}>{isPaused ? 'ПРОДОЛЖИТЬ' : 'ПАУЗА'}</button></div>
+      <div className="touch-controls">
+        <button className={leftLight ? 'active' : ''} onClick={action('leftLight')}>ЛЕВЫЙ СВЕТ</button>
+        <button className={leftDoor ? 'active' : ''} onClick={action('leftDoor')}>ЛЕВАЯ ДВЕРЬ</button>
+        <button className={cameras ? 'active' : ''} onClick={action('cameras')}>КАМЕРЫ</button>
+        <button className={rightDoor ? 'active' : ''} onClick={action('rightDoor')}>ПРАВАЯ ДВЕРЬ</button>
+        <button className={rightLight ? 'active' : ''} onClick={action('rightLight')}>ПРАВЫЙ СВЕТ</button>
+      </div>
+    </main>;
   }
 
   return <main className="menu-shell">
