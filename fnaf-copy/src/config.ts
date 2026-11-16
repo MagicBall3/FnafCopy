@@ -114,3 +114,10 @@ export const NIGHTS: NightConfig[] = [
 ];
 
 export const INITIAL_POWER = 100;
+
+export const POWER = {
+  basePerSecond: 0.08,
+  doorPerSecond: 0.30,
+  lightPerSecond: 0.25,
+  officeLightPerSecond: 0.20,
+};

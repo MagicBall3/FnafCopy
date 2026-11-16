@@ -3,6 +3,7 @@ import { useGameStore } from './store/gameStore';
 import MainMenu from './components/MainMenu';
 import Office from './components/Office';
 import HUD from './components/HUD';
+import ControlsPanel from './components/ControlsPanel';
 import PauseMenu from './components/PauseMenu';
 import SettingsPanel from './components/SettingsPanel';
 import GameOver from './components/GameOver';
@@ -26,6 +27,7 @@ export default function App() {
         <>
           <Office />
           <HUD />
+          <ControlsPanel />
           {isPaused && <PauseMenu />}
         </>
       )}

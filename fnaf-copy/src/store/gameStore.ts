@@ -9,6 +9,7 @@ export interface GameState {
   power: number;
   maxPower: number;
   powerDrainRate: number;
+  blackout: boolean;
   doors: { left: boolean; right: boolean };
   lights: { left: boolean; right: boolean };
   officeLight: boolean;
@@ -39,6 +40,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   power: INITIAL_POWER,
   maxPower: INITIAL_POWER,
   powerDrainRate: 0,
+  blackout: false,
   doors: { left: false, right: false },
   lights: { left: false, right: false },
   officeLight: true,
@@ -66,19 +68,30 @@ export const useGameStore = create<GameState>((set, get) => ({
     });
   },
 
-  toggleDoor: (side) =>
-    set((s) => ({ doors: { ...s.doors, [side]: !s.doors[side] } })),
+  toggleDoor: (side) => {
+    if (get().blackout) return;
+    set((s) => ({ doors: { ...s.doors, [side]: !s.doors[side] } }));
+  },
 
-  setDoor: (side, closed) =>
-    set((s) => ({ doors: { ...s.doors, [side]: closed } })),
+  setDoor: (side, closed) => {
+    if (get().blackout) return;
+    set((s) => ({ doors: { ...s.doors, [side]: closed } }));
+  },
 
-  toggleLight: (side) =>
-    set((s) => ({ lights: { ...s.lights, [side]: !s.lights[side] } })),
+  toggleLight: (side) => {
+    if (get().blackout) return;
+    set((s) => ({ lights: { ...s.lights, [side]: !s.lights[side] } }));
+  },
 
-  setLight: (side, on) =>
-    set((s) => ({ lights: { ...s.lights, [side]: on } })),
+  setLight: (side, on) => {
+    if (get().blackout) return;
+    set((s) => ({ lights: { ...s.lights, [side]: on } }));
+  },
 
-  toggleOfficeLight: () => set((s) => ({ officeLight: !s.officeLight })),
+  toggleOfficeLight: () => {
+    if (get().blackout) return;
+    set((s) => ({ officeLight: !s.officeLight }));
+  },
 
   setPaused: (paused) =>
     set({ isPaused: paused, screen: paused ? 'pause' : 'office' }),
